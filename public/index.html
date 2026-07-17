@@ -21,10 +21,12 @@
             animation: moveGrid 15s linear infinite;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
             overflow-x: hidden;
+            box-sizing: border-box;
         }
 
         @keyframes moveGrid {
@@ -50,11 +52,13 @@
             border-radius: 24px;
             padding: 40px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 204, 0.05);
+            margin: 40px auto;
+            flex: 1;
         }
 
         /* 
         ========================================
-        LEFT COLUMN (LOGIN & PLAY)
+        LEFT COLUMN (LOGIN, PLAY & CAMERA)
         ========================================
         */
         .col-left {
@@ -80,13 +84,13 @@
             color: #a3a3c2;
             font-size: 17px;
             line-height: 1.6;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         input {
             width: 100%;
             padding: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 18px;
             background: rgba(0, 0, 0, 0.4);
             color: #00ffcc;
@@ -109,6 +113,73 @@
             color: #66668c;
         }
 
+        /* 
+        ========================================
+        LIVE AVATAR STREAM LAYOUT
+        ========================================
+        */
+        .camera-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px dashed rgba(0, 255, 204, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+        }
+
+        #video {
+            width: 160px;
+            height: 120px;
+            background: #020208;
+            border: 2px solid #33334d;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .camera-actions {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .cam-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            background: transparent;
+            color: #e0e0ff;
+            border: 1px solid #33334d;
+            animation: none;
+            box-shadow: none;
+        }
+
+        .cam-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #a3a3c2;
+            color: #fff;
+            transform: none;
+        }
+
+        #snapBtn {
+            border-color: rgba(255, 51, 102, 0.4);
+            color: #ff3366;
+        }
+
+        #snapBtn:hover {
+            background: rgba(255, 51, 102, 0.1);
+            border-color: #ff3366;
+        }
+
+        /* 
+        ========================================
+        BUTTON ACTIONS
+        ========================================
+        */
         button {
             width: 100%;
             padding: 18px;
@@ -220,12 +291,27 @@
 
         /* 
         ========================================
+        FOOTER CONFIGURATION
+        ========================================
+        */
+        footer {
+            text-align: center;
+            font-size: 16px;
+            color: #f1e9e9;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            width: 100%;
+            margin-top: auto;
+        }
+
+        /* 
+        ========================================
         RESPONSIVE DESIGN (Mobiles/Tablets)
         ========================================
         */
         @media (max-width: 850px) {
             .main-panel {
-                grid-template-columns: 1fr; /* Stacks to 1 column on small screens */
+                grid-template-columns: 1fr;
                 padding: 30px;
                 gap: 30px;
             }
@@ -245,17 +331,27 @@
 
 <div class="main-panel">
     
-    <!-- LEFT COLUMN: Login & Start -->
+    <!-- LEFT COLUMN: Login, Camera Stream & Start -->
     <div class="col-left">
         <h1>Escape<br>Hidden Exit</h1>
         <p class="subtitle">Survive 3 levels of intense maze running.<br>Grab the key, dodge the hunters, and escape.</p>
 
         <input type="text" id="playerName" placeholder="ENTER YOUR ALIAS" autocomplete="off">
 
+        <!-- Visual Live Camera Interface Container -->
+        <div class="camera-box">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="photoCanvas" width="120" height="120" style="display:none;"></canvas>
+            <div class="camera-actions">
+                <button type="button" class="cam-btn" id="startCam">Initialize Camera</button>
+                <button type="button" class="cam-btn" id="snapBtn">Capture Avatar</button>
+            </div>
+        </div>
+
         <button id="startBtn">Initialize Run</button>
     </div>
 
-    <!-- RIGHT COLUMN: Rules & Legend -->
+    <!-- RIGHT COLUMN: Rules & Legend (Maintained Exactly) -->
     <div class="col-right">
         <h2>Mission Briefing</h2>
         <ul class="rules-list">
@@ -320,63 +416,66 @@
     </div>
 
 </div>
+
 <footer>
     &copy; 2026 Escape Hidden Exit | Developed by <strong>Manoj Kumar S</strong> | Contact: <strong>9739075592</strong>
 </footer>
 
 <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('photoCanvas');
+    let capturedData = null;
+
+    // Stream live feed from local laptop camera
+    document.getElementById('startCam').onclick = () => {
+        navigator.mediaDevices.getUserMedia({ video: { width: 120, height: 120 } })
+            .then(stream => { 
+                video.srcObject = stream; 
+                document.getElementById('video').style.borderColor = "#00ffcc";
+            })
+            .catch(err => {
+                alert("Camera access denied or unavailable. Please grant system permissions.");
+            });
+    };
+
+    // Extract exact dataURL canvas snap frames safely 
+    document.getElementById('snapBtn').onclick = () => {
+        if (!video.srcObject) {
+            alert("Please activate the camera stream before snapping an image.");
+            return;
+        }
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, 120, 120);
+        capturedData = canvas.toDataURL('image/png');
+        document.getElementById('video').style.borderColor = "#ff3366";
+        alert("System Authentication Profile Locked!");
+    };
+
+    // Process variables and pass parameters cleanly to core game files
     document.getElementById("startBtn").onclick = function() {
         let name = document.getElementById("playerName").value.trim();
 
         if(name === "") {
             name = "Player 1"; 
         }
+        if(!capturedData) { 
+            alert("Security Clearance Error: Please snap your avatar photo first to execute the initialization process."); 
+            return; 
+        }
 
         localStorage.setItem("playerName", name);
+        localStorage.setItem("playerAvatar", capturedData);
         window.location.href = "game.html"; 
     };
 
-    // Allow pressing "Enter" on the keyboard to start the game
+    // Allow pressing "Enter" inside text box to fire active click handlers
     document.getElementById("playerName").addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
             event.preventDefault();
             document.getElementById("startBtn").click();
         }
     });
-
-    
 </script>
-<style>
-    /* Ensure the body takes full height and uses flexbox */
-    body {
-        margin: 0;
-        min-height: 100vh; /* Minimum 100% of the viewport height */
-        display: flex;
-        flex-direction: column; /* Stack elements vertically */
-        background-color: #080812;
-        font-family: Arial, sans-serif;
-    }
-
-    /* This forces the content above the footer to expand */
-    .main-panel {
-        flex: 1; /* Pushes the footer down */
-        margin: 40px auto;
-        /* ... keep your other existing styles for .main-panel ... */
-    }
-
-    /* Fixed bottom footer styling */
-    footer {
-        text-align: center;
-        font-size: 22px;
-        color: #f1e9e9;
-        padding: 20px;
-        background: rgba(0,0,0,0.3);
-        width: 100%;
-        margin-top: auto; /* This is the magic line that pins it to the bottom */
-    }
-</style>
-
 
 </body>
 </html>
-

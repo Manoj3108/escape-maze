@@ -209,6 +209,31 @@ function setupLevel(scene) {
     createMysteryTraps(scene, 2);               
     
     playLevelIntro(scene);
+
+
+    // ADD THIS CODE BLOCK:
+    const avatarData = localStorage.getItem("playerAvatar");
+    const name = localStorage.getItem("playerName") || "Player 1";
+
+    if (avatarData) {
+        // Create an HTML container for the UI
+        const ui = document.createElement('div');
+        ui.style.position = 'absolute';
+        ui.style.top = '20px';
+        ui.style.right = '20px';
+        ui.style.textAlign = 'center';
+        ui.style.zIndex = '1000'; // Ensures it stays above the canvas
+
+        ui.innerHTML = `
+            <img src="${avatarData}" style="width:150px; height:150px; border-radius:50%; border:3px solid #00ffcc; object-fit: cover;">
+            <div style="color:#ffffff; font-family:Arial, sans-serif; font-weight:bold; margin-top:5px; text-shadow: 1px 1px 2px #000;">
+                ${name}
+            </div>
+        `;
+        
+        document.body.appendChild(ui);
+    }
+
 }
 
 function playLevelIntro(scene) {
@@ -661,21 +686,41 @@ function checkExitReached() {
 // GAME OVER
 // ======================================
 
-function endGame(message) {
+function endGame(reason) {
     if (gameOver) return;
+
+    lives--; // Subtract a life
+
+    if (lives > 0) {
+        // Player still has lives
+        alert("System Alert: Life Lost! \nRemaining Lives: " + lives + "\n\nGet ready for the next attempt.");
+        
+        // Reset player position instead of restarting the whole game
+        player.setPosition(startX, startY); 
+        return;
+    }
+
+    // No lives left - Final Game Over
     gameOver = true;
     
-    // 1. Stop the music
+    // Stop Music
     if (sceneRef.bgm) sceneRef.bgm.stop();
-    
-    // 2. Play a "Game Over" sound 
-    // If you have a specific "death" sound, you can swap "sfx_hurt" here
     if (sceneRef.sfx_hurt) sceneRef.sfx_hurt.play();
     
-    // 3. Show the final alert with the score before reloading
-    alert(message + "\n\nFinal Score : " + score);
+    // The "Funny" Final Death Messages
+    const finalMessages = [
+        "SYSTEM CRITICAL: All lives exhausted. You are not meant for this maze.",
+        "GAME OVER: Even the best runners eventually run out of luck.",
+        "TERMINATED: The Hunter is now officially bored of you.",
+        "ERROR 404: Skill not found. Restarting simulation...",
+        "DELETED: Your performance was... memorable, but ultimately fatal."
+    ];
     
-    // 4. Redirect to menu
+    let finalMsg = finalMessages[Math.floor(Math.random() * finalMessages.length)];
+    
+    alert(finalMsg + "\n\nFinal Score: " + score + "\n\n© 2026 Manoj Kumar S | 9739075592");
+    
+    // Redirect to menu
     window.location.href = "index.html";
 }
 
