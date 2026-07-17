@@ -320,6 +320,9 @@
     </div>
 
 </div>
+<footer>
+    &copy; 2026 Escape Hidden Exit | Developed by <strong>Manoj Kumar S</strong> | Contact: <strong>9739075592</strong>
+</footer>
 
 <script>
     document.getElementById("startBtn").onclick = function() {
@@ -340,7 +343,40 @@
             document.getElementById("startBtn").click();
         }
     });
+
+    
 </script>
+<style>
+    /* Ensure the body takes full height and uses flexbox */
+    body {
+        margin: 0;
+        min-height: 100vh; /* Minimum 100% of the viewport height */
+        display: flex;
+        flex-direction: column; /* Stack elements vertically */
+        background-color: #080812;
+        font-family: Arial, sans-serif;
+    }
+
+    /* This forces the content above the footer to expand */
+    .main-panel {
+        flex: 1; /* Pushes the footer down */
+        margin: 40px auto;
+        /* ... keep your other existing styles for .main-panel ... */
+    }
+
+    /* Fixed bottom footer styling */
+    footer {
+        text-align: center;
+        font-size: 22px;
+        color: #f1e9e9;
+        padding: 20px;
+        background: rgba(0,0,0,0.3);
+        width: 100%;
+        margin-top: auto; /* This is the magic line that pins it to the bottom */
+    }
+</style>
+
 
 </body>
 </html>
+

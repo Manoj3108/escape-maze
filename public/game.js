@@ -688,10 +688,37 @@ function showGameOverScreen(message) {
     sceneRef.add.text(900, 500, "GAME OVER", { fontSize: "60px", color: "#ff0000" }).setOrigin(0.5).setScrollFactor(0);
     sceneRef.add.text(900, 600, message, { fontSize: "30px", color: "#ffffff" }).setOrigin(0.5).setScrollFactor(0);
     sceneRef.add.text(900, 650, "Final Score: " + score, { fontSize: "30px", color: "#00ffff" }).setOrigin(0.5).setScrollFactor(0);
-    
+    function getFunnyDeathMessage() {
+    const messages = [
+        "The Hunter caught you. You weren't that fast, were you?",
+        "Spiked! Did you think that was a jump pad?",
+        "You died. At least the high score board will have a good laugh.",
+        "You ran out of time. Maybe try running... faster?",
+        "Ouch. That looked like it hurt in 8-bit resolution.",
+        "The Hunter says thanks for the snack."
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+// Then call it in your endGame function:
+endGame(getFunnyDeathMessage());function getFunnyDeathMessage() {
+    const messages = [
+        "The Hunter caught you. You weren't that fast, were you?",
+        "Spiked! Did you think that was a jump pad?",
+        "You died. At least the high score board will have a good laugh.",
+        "You ran out of time. Maybe try running... faster?",
+        "Ouch. That looked like it hurt in 8-bit resolution.",
+        "The Hunter says thanks for the snack."
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+// Then call it in your endGame function:
+endGame(getFunnyDeathMessage());
     // Click to return to menu
     let btn = sceneRef.add.text(900, 750, "CLICK TO RETURN TO MENU", { fontSize: "24px", color: "#00ffcc", backgroundColor: "#333" })
         .setOrigin(0.5).setScrollFactor(0).setInteractive();
         
     btn.on('pointerdown', () => { window.location.href = "index.html"; });
 }
+
