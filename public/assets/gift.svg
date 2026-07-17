@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+    <!-- Main Box -->
+    <rect x="6" y="14" width="28" height="22" fill="#ff3366" rx="2"/>
+    <!-- Box Lid -->
+    <rect x="4" y="10" width="32" height="6" fill="#ff0044" rx="1"/>
+    <!-- Vertical Ribbon -->
+    <rect x="17" y="10" width="6" height="26" fill="#ffcc00"/>
+    <!-- Bow Loops -->
+    <path d="M 20 10 C 10 -2, 2 10, 17 10 Z" fill="#ffcc00"/>
+    <path d="M 20 10 C 30 -2, 38 10, 23 10 Z" fill="#ffcc00"/>
+</svg>

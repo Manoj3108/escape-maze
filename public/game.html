@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Hidden Exit - Playing</title>
+    
+    <style>
+        /* This CSS ensures the game takes up the entire screen without annoying scrollbars */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0a0a14; /* Matches the abyss background */
+            overflow: hidden; /* Hides scrollbars */
+        }
+        
+        #game {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- This empty div is exactly where Phaser will draw your game canvas -->
+    <div id="game"></div>
+
+    <!-- 1. Load the Phaser 3 Engine (Required to run the game) -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+    <!-- 2. Load your Maze Generation code -->
+    <script src="maze.js"></script>
+
+    <!-- 3. Load your Main Game Logic -->
+    <script src="game.js"></script>
+
+</body>
+</html>

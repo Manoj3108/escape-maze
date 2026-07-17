@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+    <!-- Solid dark background to block the game background -->
+    <rect width="40" height="40" fill="#080808"/>
+    
+    <!-- Outer bright green border -->
+    <rect x="1" y="1" width="38" height="38" fill="none" stroke="#00ff00" stroke-width="2"/>
+    
+    <!-- Diagonal bright green line (Top-Left to Bottom-Right) -->
+    <line x1="1" y1="1" x2="39" y2="39" stroke="#00ff00" stroke-width="2"/>
+</svg>

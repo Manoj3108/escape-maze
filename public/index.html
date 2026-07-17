@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Hidden Exit - Menu</title>
+    <style>
+        /* 
+        ========================================
+        ANIMATED NEON GRID BACKGROUND
+        ========================================
+        */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #080812;
+            background-image: 
+                linear-gradient(rgba(0, 255, 204, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.07) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: moveGrid 15s linear infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* 
+        ========================================
+        MAIN 2-COLUMN GLASSMORPHISM CONTAINER
+        ========================================
+        */
+        .main-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1000px;
+            width: 90%;
+            background: rgba(15, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 255, 204, 0.05);
+        }
+
+        /* 
+        ========================================
+        LEFT COLUMN (LOGIN & PLAY)
+        ========================================
+        */
+        .col-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            padding-right: 20px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 54px;
+            margin: 0 0 15px 0;
+            line-height: 1.1;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px #00ffcc, 0 0 30px #00ffcc;
+        }
+
+        .subtitle {
+            color: #a3a3c2;
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #00ffcc;
+            border: 2px solid #33334d;
+            border-radius: 12px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        input:focus {
+            border-color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            background: rgba(0, 255, 204, 0.05);
+        }
+
+        input::placeholder {
+            color: #66668c;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #00ffcc;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        button:hover {
+            background: #ffffff;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            transform: translateY(-3px);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 204, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+        }
+
+        /* 
+        ========================================
+        RIGHT COLUMN (RULES & LEGEND)
+        ========================================
+        */
+        .col-right {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            margin: 0 0 15px 0;
+            color: #ffcc00;
+            font-size: 24px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+
+        .rules-list {
+            color: #d1d1e0;
+            margin: 0 0 30px 0;
+            padding-left: 20px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .rules-list li {
+            margin-bottom: 10px;
+        }
+
+        .rules-list strong {
+            color: #ff3366;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .legend-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 255, 204, 0.3);
+            transform: translateX(5px);
+        }
+
+        .legend-item img {
+            width: 36px;
+            height: 36px;
+            margin-right: 15px;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4)); 
+        }
+
+        .legend-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .legend-text strong {
+            color: #ffffff;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .legend-text span {
+            color: #8c8cba;
+            font-size: 13px;
+        }
+
+        /* 
+        ========================================
+        RESPONSIVE DESIGN (Mobiles/Tablets)
+        ========================================
+        */
+        @media (max-width: 850px) {
+            .main-panel {
+                grid-template-columns: 1fr; /* Stacks to 1 column on small screens */
+                padding: 30px;
+                gap: 30px;
+            }
+            .col-left {
+                padding-right: 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 30px;
+            }
+            h1 {
+                font-size: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-panel">
+    
+    <!-- LEFT COLUMN: Login & Start -->
+    <div class="col-left">
+        <h1>Escape<br>Hidden Exit</h1>
+        <p class="subtitle">Survive 3 levels of intense maze running.<br>Grab the key, dodge the hunters, and escape.</p>
+
+        <input type="text" id="playerName" placeholder="ENTER YOUR ALIAS" autocomplete="off">
+
+        <button id="startBtn">Initialize Run</button>
+    </div>
+
+    <!-- RIGHT COLUMN: Rules & Legend -->
+    <div class="col-right">
+        <h2>Mission Briefing</h2>
+        <ul class="rules-list">
+            <li>Locate the Key to reveal the hidden Exit.</li>
+            <li>Hunters ignore you... <strong>until you take the key.</strong></li>
+            <li>The Exit spawns far away. Plan your escape route!</li>
+            <li>Complete all 3 levels before the system wipes (Time Up).</li>
+        </ul>
+
+        <h2>Database Legend</h2>
+        <div class="legend">
+            
+            <div class="legend-item">
+                <img src="assets/player.svg" alt="Player">
+                <div class="legend-text">
+                    <strong>Player Unit</strong>
+                    <span>Use Arrow Keys to navigate the grid.</span>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <img src="assets/key.svg" alt="Key">
+                <div class="legend-text">
+                    <strong>Access Key</strong>
+                    <span>Collect this to spawn the level exit.</span>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <img src="assets/enemy.svg" alt="Enemy">
+                <div class="legend-text">
+                    <strong>Hunter Program</strong>
+                    <span>Turns lethal (Red) when the key is taken.</span>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <img src="assets/gift.svg" alt="Gift">
+                <div class="legend-text">
+                    <strong>Mystery Node</strong>
+                    <span>Awards massive points OR teleports you.</span>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <img src="assets/spike.svg" alt="Spike">
+                <div class="legend-text">
+                    <strong>Grid Trap</strong>
+                    <span>Most teleport you. ONE is lethal!</span>
+                </div>
+            </div>
+
+            <div class="legend-item">
+                <img src="assets/coin.svg" alt="Coin">
+                <div class="legend-text">
+                    <strong>Data Coin</strong>
+                    <span>Collect for +50 Bonus Score.</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById("startBtn").onclick = function() {
+        let name = document.getElementById("playerName").value.trim();
+
+        if(name === "") {
+            name = "Player 1"; 
+        }
+
+        localStorage.setItem("playerName", name);
+        window.location.href = "game.html"; 
+    };
+
+    // Allow pressing "Enter" on the keyboard to start the game
+    document.getElementById("playerName").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.getElementById("startBtn").click();
+        }
+    });
+</script>
+
+</body>
+</html>
