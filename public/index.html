@@ -340,15 +340,27 @@
 
         <!-- Visual Live Camera Interface Container -->
         <div class="camera-box">
-            <video id="video" autoplay playsinline></video>
+            <video id="video" autoplay playsinline>     
+            </video>
+
+            <img id="capturedPhoto"
+     style="display:none;
+            width:160px;
+            height:120px;
+            border:2px solid #00ffcc;
+            border-radius:12px;
+            object-fit:cover;
+            margin-bottom:12px;">
+
+
             <canvas id="photoCanvas" width="120" height="120" style="display:none;"></canvas>
             <div class="camera-actions">
                 <button type="button" class="cam-btn" id="startCam">Initialize Camera</button>
-                <button type="button" class="cam-btn" id="snapBtn">Capture Avatar</button>
+                <button type="button" class="cam-btn" id="snapBtn">Capture Photo</button>
             </div>
         </div>
 
-        <button id="startBtn">Initialize Run</button>
+        <button id="startBtn">Initialize Game</button>
     </div>
 
     <!-- RIGHT COLUMN: Rules & Legend (Maintained Exactly) -->
@@ -412,6 +424,14 @@
                 </div>
             </div>
 
+            <div class="legend-item">
+                <img src="assets/Exit.svg" alt="Exit">
+                <div class="legend-text">
+                    <strong>Level Exit</strong>
+                    <span>Reach this to complete the level.</span>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -439,17 +459,32 @@
     };
 
     // Extract exact dataURL canvas snap frames safely 
-    document.getElementById('snapBtn').onclick = () => {
-        if (!video.srcObject) {
-            alert("Please activate the camera stream before snapping an image.");
-            return;
-        }
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, 120, 120);
-        capturedData = canvas.toDataURL('image/png');
-        document.getElementById('video').style.borderColor = "#ff3366";
-        alert("System Authentication Profile Locked!");
-    };
+  document.getElementById('snapBtn').onclick = () => {
+    if (!video.srcObject) {
+        alert("Please activate the camera stream before snapping an image.");
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, 120, 120);
+
+    capturedData = canvas.toDataURL('image/png');
+
+    // Display captured image
+    const img = document.getElementById("capturedPhoto");
+    img.src = capturedData;
+    img.style.display = "block";
+
+    // Hide live camera
+    video.style.display = "none";
+
+    // Stop camera
+    video.srcObject.getTracks().forEach(track => track.stop());
+
+    document.getElementById('video').style.borderColor = "#ff3366";
+
+    alert("System Authentication Profile Locked!");
+};
 
     // Process variables and pass parameters cleanly to core game files
     document.getElementById("startBtn").onclick = function() {

@@ -12,6 +12,7 @@ game.js - (Random Spawns & Teleporting Traps)
 let sceneRef;
 let player;
 let cursors;
+let wasd;
 
 let timerText;
 let statusText;
@@ -24,7 +25,7 @@ let gameOver = false;
 let isCinematic = false; 
 
 let score = 0;
-let timeLeft = 240;
+let timeLeft = 300;
 let lives = 3;
 let currentLevel = 1; 
 let maxLevel = 3;     
@@ -154,6 +155,13 @@ function create() {
 
     // Controls
     cursors = this.input.keyboard.createCursorKeys();
+
+    wasd = this.input.keyboard.addKeys({
+    up: Phaser.Input.Keyboard.KeyCodes.W,
+    down: Phaser.Input.Keyboard.KeyCodes.S,
+    left: Phaser.Input.Keyboard.KeyCodes.A,
+    right: Phaser.Input.Keyboard.KeyCodes.D
+});
 
     // Resize
     window.addEventListener("resize", () => {
@@ -318,10 +326,21 @@ function movePlayer() {
     let nextX = player.x;
     let nextY = player.y;
 
-    if (cursors.left.isDown) nextX -= moveSpeed;
-    if (cursors.right.isDown) nextX += moveSpeed;
-    if (cursors.up.isDown) nextY -= moveSpeed;
-    if (cursors.down.isDown) nextY += moveSpeed;
+    if (cursors.left.isDown || wasd.left.isDown) {
+    nextX -= moveSpeed;
+}
+
+if (cursors.right.isDown || wasd.right.isDown) {
+    nextX += moveSpeed;
+}
+
+if (cursors.up.isDown || wasd.up.isDown) {
+    nextY -= moveSpeed;
+}
+
+if (cursors.down.isDown || wasd.down.isDown) {
+    nextY += moveSpeed;
+} 
 
     if (!hitsWall(nextX, player.y)) player.x = nextX;
     if (!hitsWall(player.x, nextY)) player.y = nextY;
@@ -349,7 +368,8 @@ function spawnSmartEnemies(scene, amount) {
         
         enemy.direction = Phaser.Math.Between(0, 3); 
         enemy.baseSpeed = 0.6;
-        enemy.chaseSpeed = 1.1; 
+        enemy.chaseSpeed = 1.1
+        ; 
         
         smartEnemies.push(enemy);
     }
@@ -649,37 +669,228 @@ function addBonus(points) {
 }
 
 function checkExitReached() {
+
     if (!sceneRef.hasKey || !sceneRef.exit) return;
 
-    if (Phaser.Math.Distance.Between(player.x, player.y, sceneRef.exit.x, sceneRef.exit.y) < 30) {
-        
-        if (currentLevel < maxLevel) {
-            if(sceneRef.sfx_win) sceneRef.sfx_win.play();
-            addBonus(500); 
-            
-            currentLevel++;
-            levelText.setText("Level : " + currentLevel + " / " + maxLevel);
-            
-            clearLevel(sceneRef);
-            setupLevel(sceneRef);
-            
-            sceneRef.cameras.main.flash(500, 255, 255, 255);
-            
-        } else {
-            gameOver = true;
-            if(sceneRef.bgm) sceneRef.bgm.stop();
-            if(sceneRef.sfx_win) sceneRef.sfx_win.play();
-            
-            addBonus(2000 + (timeLeft * 10)); 
+    if (Phaser.Math.Distance.Between(
+        player.x,
+        player.y,
+        sceneRef.exit.x,
+        sceneRef.exit.y
+    ) < 30) {
 
-            alert(
-                "🎉 CONGRATULATIONS! YOU BEAT THE GAME! 🎉\n\n" +
-                "You Escaped the Final Level!\n\n" +
-                "Final Score : " + score
-            );
-            setTimeout(() => { window.location.href = "index.html"; }, 800);
+        if (sceneRef.sfx_win) sceneRef.sfx_win.play();
+
+        // ===============================
+        // LAST LEVEL COMPLETED
+        // ===============================
+        if (currentLevel >= maxLevel) {
+
+            statusText.setText("MISSION COMPLETE!");
+
+            sceneRef.time.delayedCall(1000, () => {
+                endGame("🎉 Congratulations!\nYou Escaped Hidden Exit!\n\nFinal Score : " + score);
+            });
+
+            return;
         }
+
+        // ===============================
+        // NEXT LEVEL
+        // ===============================
+        currentLevel++;
+        isCinematic = true;
+
+        sceneRef.cameras.main.fadeOut(500);
+
+        sceneRef.time.delayedCall(600, () => {
+
+            // Remove old objects
+            clearLevel(sceneRef);
+
+            // Overlay
+            const overlay = sceneRef.add.rectangle(
+                sceneRef.cameras.main.centerX,
+                sceneRef.cameras.main.centerY,
+                sceneRef.cameras.main.width,
+                sceneRef.cameras.main.height,
+                0x000000,
+                0.96
+            )
+            .setScrollFactor(0)
+            .setDepth(500);
+
+            // Title
+            const title = sceneRef.add.text(
+                sceneRef.cameras.main.centerX,
+                90,
+                "✔ MISSION COMPLETE",
+                {
+                    fontSize: "40px",
+                    color: "#00ffcc",
+                    fontStyle: "bold"
+                }
+            )
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setDepth(501);
+
+            // Stats
+            const info = sceneRef.add.text(
+                sceneRef.cameras.main.centerX,
+                220,
+
+`Current Score : ${score}
+
+Lives Remaining : ${"❤".repeat(lives)}
+
+Coins Collected : ${10 - coins.length}
+
+Time Bonus : +${timeLeft * 5}`,
+
+                {
+                    fontSize: "28px",
+                    color: "#ffffff",
+                    align: "center",
+                    lineSpacing: 10
+                }
+            )
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setDepth(501);
+
+            // Progress
+            const progress = sceneRef.add.text(
+                sceneRef.cameras.main.centerX,
+                500,
+                "Preparing Next Sector...\n\n░░░░░░░░░░ 0%",
+                {
+                    fontSize: "28px",
+                    color: "#00ffcc",
+                    align: "center"
+                }
+            )
+            .setOrigin(0.5)
+            .setScrollFactor(0)
+            .setDepth(501);
+
+            const glitches = [
+                "SYSTEM BREACH",
+                "LOADING ENEMY AI",
+                "RECONFIGURING MAZE",
+                "GENERATING EXIT",
+                "INITIALIZING TRAPS",
+                "ACCESS GRANTED"
+            ];
+
+            let percent = 0;
+
+            const loading = sceneRef.time.addEvent({
+
+                delay: 120,
+
+                repeat: 50,
+
+                callback: () => {
+
+                    percent += 2;
+
+                    let bars = Math.floor(percent / 10);
+
+                    progress.setText(
+
+                        glitches[Math.floor(Math.random() * glitches.length)]
+
+                        +
+
+                        "\n\n"
+
+                        +
+
+                        "█".repeat(bars)
+
+                        +
+
+                        "░".repeat(10 - bars)
+
+                        +
+
+                        " "
+
+                        +
+
+                        percent
+
+                        +
+
+                        "%"
+
+                    );
+
+                    overlay.alpha = 0.88 + Math.random() * 0.08;
+
+                    title.x = sceneRef.cameras.main.centerX + Phaser.Math.Between(-2, 2);
+
+                    title.y = 90 + Phaser.Math.Between(-2, 2);
+
+                    sceneRef.cameras.main.shake(20, 0.001);
+
+                    if (percent >= 100) {
+
+                        loading.remove();
+
+                        sceneRef.time.delayedCall(700, () => {
+
+                            overlay.destroy();
+                            title.destroy();
+                            info.destroy();
+                            progress.destroy();
+
+                            levelText.setText(
+                                "Level : " + currentLevel + " / " + maxLevel
+                            );
+
+                            setupLevel(sceneRef);
+
+                            sceneRef.cameras.main.fadeIn(600);
+
+                            const levelTitle = sceneRef.add.text(
+                                sceneRef.cameras.main.centerX,
+                                sceneRef.cameras.main.centerY,
+                                "LEVEL " + currentLevel,
+                                {
+                                    fontSize: "64px",
+                                    fontStyle: "bold",
+                                    color: "#00ffcc",
+                                    backgroundColor: "#000000"
+                                }
+                            )
+                            .setOrigin(0.5)
+                            .setScrollFactor(0)
+                            .setDepth(999);
+
+                            sceneRef.tweens.add({
+                                targets: levelTitle,
+                                alpha: 0,
+                                duration: 1500,
+                                delay: 1200,
+                                onComplete: () => levelTitle.destroy()
+                            });
+
+                            isCinematic = false;
+
+                        });
+
+                    }
+
+                }
+
+            });
+
+        });
+
     }
+
 }
 
 // ======================================
@@ -718,7 +929,7 @@ function endGame(reason) {
     
     let finalMsg = finalMessages[Math.floor(Math.random() * finalMessages.length)];
     
-    alert(finalMsg + "\n\nFinal Score: " + score + "\n\n© 2026 Manoj Kumar S | 9739075592");
+    alert(finalMsg + "\n\nFinal Score: " + score + "\n\nReturning to Main Menu.");
     
     // Redirect to menu
     window.location.href = "index.html";
