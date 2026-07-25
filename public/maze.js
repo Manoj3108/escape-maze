@@ -2,7 +2,7 @@
 ==========================================
 Escape Hidden Exit
 Ultra-Complex & Creative Maze Generator
-Part 1
+Part 1 (Fixed & Expanded Open Paths)
 ==========================================
 */
 
@@ -14,8 +14,8 @@ function drawMaze(scene){
     scene.spawnY=60;
 
     scene.exit=scene.add.image(
-        840,
-        590,
+        1190,
+        750,
         "exit"
     );
 
@@ -38,23 +38,17 @@ function drawMaze(scene){
     }
 
     // ======================
-    // Borders
+    // Expanded Borders (1260 x 810)
     // ======================
 
-    for(let x=30;x<=870;x+=30){
-
+    for(let x=30; x<=1230; x+=30){
         addWall(x,30);
-
-        addWall(x,620);
-
+        addWall(x,780);
     }
 
-    for(let y=60;y<=590;y+=30){
-
+    for(let y=60; y<=750; y+=30){
         addWall(30,y);
-
-        addWall(870,y);
-
+        addWall(1230,y);
     }
 
     // ======================
@@ -114,224 +108,175 @@ function drawMaze(scene){
 }
 
 // =========================================================================
-// CREATIVE & INTENSELY COMPLEX LAYOUTS
+// FIXED LAYOUTS WITH GUARANTEED PASSAGES (No Full Vertical Line Traps)
 // =========================================================================
 
 function layoutOne(addWall) {
-    // "The Gauntlet of Teeth" - Alternating lock-and-key patterns across columns
-    for (let x = 120; x <= 840; x += 90) {
-        let gapY = (x / 90) % 2 === 0 ? 150 : 480;
-        let altGap = (x / 90) % 2 === 0 ? 360 : 270;
-        for (let y = 60; y <= 590; y += 30) {
-            if (y !== gapY && y !== altGap) addWall(x, y);
+    // "The Broken Teeth" - Columns have wide gaps so the player is never locked in
+    for (let x = 120; x <= 1200; x += 90) {
+        let gapY1 = 150;
+        let gapY2 = 450;
+        let gapY3 = 630;
+        for (let y = 60; y <= 750; y += 30) {
+            if (y !== gapY1 && y !== gapY2 && y !== gapY3) addWall(x, y);
         }
     }
-    for (let y = 180; y <= 540; y += 120) {
-        for (let x = 60; x <= 840; x += 30) {
-            if (x % 90 !== 0 && x !== 210 && x !== 570) addWall(x, y);
+    for (let y = 210; y <= 600; y += 180) {
+        for (let x = 60; x <= 1200; x += 30) {
+            if (x % 180 !== 0) addWall(x, y);
         }
     }
 }
 
 function layoutTwo(addWall) {
-    // "Double Spiral Labyrinth" - Forces the player deep into a center trap before escaping
-    for (let x = 120; x <= 780; x += 30) addWall(x, 120);
-    for (let y = 120; y <= 500; y += 30) addWall(780, y);
-    for (let x = 210; x <= 780; x += 30) addWall(x, 500);
-    for (let y = 210; y <= 500; y += 30) addWall(210, y);
-    for (let x = 210; x <= 690; x += 30) addWall(x, 210);
-    for (let y = 210; y <= 420; y += 30) addWall(690, y);
-    
-    // Deceptive inner bypass lanes
-    for (let y = 270; y <= 390; y += 30) {
-        addWall(330, y);
-        addWall(540, y);
+    // "Nested Chambers" - Open rectangular rings with wide entry doors
+    for (let x = 120; x <= 1140; x += 30) {
+        if (x !== 630) { addWall(x, 150); addWall(x, 630); }
     }
-    for (let x = 330; x <= 540; x += 30) {
-        if (x !== 450) addWall(x, 270);
-        if (x !== 390) addWall(x, 390);
+    for (let y = 150; y <= 630; y += 30) {
+        if (y !== 360) { addWall(120, y); addWall(1140, y); }
+    }
+    // Inner maze structure with open crossways
+    for (let x = 300; x <= 960; x += 180) {
+        for (let y = 240; y <= 540; y += 30) {
+            if (y !== 390) addWall(x, y);
+        }
     }
 }
 
 function layoutThree(addWall) {
-    // "Fractal Comb" - Deceptive parallel branches that mostly lead to long dead ends
-    for (let y = 150; y <= 510; y += 120) {
-        for (let x = 60; x <= 810; x += 30) addWall(x, y);
-    }
-    for (let x = 150; x <= 810; x += 150) {
-        for (let y = 60; y <= 590; y += 30) {
-            if (y % 120 !== 0 && y !== 90 && y !== 450) addWall(x, y);
+    // "Staggered Blocks" - Modular cluster maze preventing wall lockups
+    for (let x = 150; x <= 1110; x += 180) {
+        for (let y = 90; y <= 690; y += 180) {
+            // Build small open-sided blocks instead of solid lines
+            addWall(x, y);
+            addWall(x + 30, y);
+            addWall(x, y + 30);
+            addWall(x + 30, y + 30);
         }
     }
-    // Strategic micro-blocks blocking natural paths
-    addWall(90, 240);
-    addWall(240, 330);
-    addWall(540, 90);
-    addWall(720, 480);
+    // Horizontal weaving lanes
+    for (let y = 180; y <= 600; y += 180) {
+        for (let x = 60; x <= 1200; x += 60) {
+            if (x % 360 !== 0) addWall(x, y);
+        }
+    }
 }
 
 function layoutFour(addWall) {
-    // "The Matrix Grid Shifter" - Tiny 2x2 movement chambers requiring tight weaving
-    for (let x = 90; x <= 840; x += 60) {
-        for (let y = 60; y <= 590; y += 60) {
-            addWall(x, y);
-            // Dynamic checkboard hole pattern
+    // "Open Weaver" - Diagonal weave pattern with guaranteed escape gaps
+    for (let x = 90; x <= 1200; x += 60) {
+        for (let y = 60; y <= 750; y += 60) {
             if ((x + y) % 120 === 0) {
-                if (x + 30 <= 840) addWall(x + 30, y);
+                if (x + 30 <= 1200 && y !== 360) addWall(x + 30, y);
             } else {
-                if (y + 30 <= 590) addWall(x, y + 30);
+                if (y + 30 <= 750 && x !== 630) addWall(x, y + 30);
             }
         }
     }
 }
 
 function layoutFive(addWall) {
-    // "Concentric Diamond Ribs" - Angled progression forcing long outer-to-inner journeys
-    for (let x = 60; x <= 840; x += 30) {
-        let distFromCenter = Math.abs(x - 450);
-        if (distFromCenter > 30 && distFromCenter < 350) {
-            if (x % 90 === 0) {
-                for (let y = 90; y <= 540; y += 30) {
-                    if (y !== 150 && y !== 330 && y !== 480) addWall(x, y);
-                }
-            }
-        }
-    }
-    for (let y = 150; y <= 510; y += 90) {
-        for (let x = 90; x <= 810; x += 30) {
-            if (x % 180 !== 0) addWall(x, y);
+    // "Diamond Corridor" - Spacious geometric pathways
+    for (let x = 90; x <= 1170; x += 90) {
+        let offset = Math.abs(630 - x);
+        for (let y = 90 + offset/2; y <= 720 - offset/2; y += 60) {
+            if (y % 120 !== 0) addWall(x, y);
         }
     }
 }
 
 function layoutSix(addWall) {
-    // "The Twin Citadels" - Left and Right heavy chambers with a chaotic choke point in the middle
-    for (let y = 90; y <= 540; y += 30) {
-        if (y !== 210 && y !== 450) addWall(270, y);
-        if (y !== 150 && y !== 390) addWall(570, y);
+    // "Twin Hubs" - Large open rooms connected by clear corridors
+    for (let y = 90; y <= 720; y += 30) {
+        if (y < 300 || y > 450) {
+            addWall(390, y);
+            addWall(870, y);
+        }
     }
-    // Internal maze inside left citadel
-    for (let x = 60; x <= 270; x += 60) {
-        for (let y = 120; y <= 510; y += 120) addWall(x, y);
+    for (let x = 120; x <= 300; x += 90) {
+        addWall(x, 240);
+        addWall(x, 540);
     }
-    // Internal maze inside right citadel
-    for (let x = 570; x <= 840; x += 60) {
-        for (let y = 90; y <= 480; y += 120) addWall(x, y);
-    }
-    // Connective tissue center lines
-    for (let x = 330; x <= 510; x += 30) {
-        addWall(x, 180);
-        addWall(x, 420);
+    for (let x = 960; x <= 1140; x += 90) {
+        addWall(x, 240);
+        addWall(x, 540);
     }
 }
 
 function layoutSeven(addWall) {
-    // "Serpentine Splitter" - Three winding paths, two of which completely trap the player near the end
-    for (let y = 120; y <= 540; y += 120) {
-        for (let x = 90; x <= 780; x += 30) addWall(x, y);
+    // "Winding Channels" - Horizontal snake paths with wide transitions
+    for (let y = 180; y <= 600; y += 120) {
+        for (let x = 90; x <= 1140; x += 30) {
+            if (x % 360 !== 0) addWall(x, y);
+        }
     }
-    for (let y = 180; y <= 420; y += 120) {
-        for (let x = 150; x <= 840; x += 30) addWall(x, y);
+    for (let y = 120; y <= 660; y += 120) {
+        for (let x = 270; x <= 1200; x += 360) {
+            // Vertical connectors leaving spaces open
+            if (x <= 1200) {
+                addWall(x, y);
+                addWall(x, y + 30);
+            }
+        }
     }
-    // Drop walls that convert horizontal long corridors into sudden dead ends
-    addWall(240, 90);
-    addWall(480, 210);
-    addWall(720, 330);
-    addWall(360, 450);
-    addWall(600, 570);
 }
 
 function layoutEight(addWall) {
-    // "Asymmetric Hive" - Organic, non-repeating node rooms that mask the correct direction
-    for (let x = 120; x <= 840; x += 120) {
-        for (let y = 90; y <= 540; y += 90) {
+    // "Cellular Node Network" - Spacious islands with multiple exit vectors
+    for (let x = 180; x <= 1080; x += 180) {
+        for (let y = 150; y <= 630; y += 150) {
             addWall(x, y);
-            // Scatter accent walls asynchronously
-            if ((x + y) % 5 === 0) addWall(x - 30, y);
-            if ((x * y) % 3 === 0) addWall(x, y + 30);
-            if ((x - y) % 4 === 0) addWall(x + 30, y);
+            addWall(x + 30, y);
+            addWall(x, y + 30);
+            addWall(x + 30, y + 30);
+            
+            // Branching arms
+            addWall(x - 60, y);
+            addWall(x + 90, y);
         }
     }
-    // Clean escape route blockers
-    for (let x = 720; x <= 840; x += 30) addWall(x, 480);
-    for (let y = 480; y <= 570; y += 30) addWall(720, y);
 }
 
 function layoutNine(addWall) {
-    // "The Hourglass Mirror" - Funnels players into a ultra-tight center lane, then opens into a blind choice layout
-    for (let x = 60; x <= 360; x += 30) {
-        addWall(x, 180);
-        addWall(x, 450);
+    // "Hourglass Arena" - Wide open center with guarded flanks
+    for (let x = 120; x <= 510; x += 60) {
+        addWall(x, 210);
+        addWall(x, 570);
     }
-    for (let x = 540; x <= 840; x += 30) {
-        addWall(x, 180);
-        addWall(x, 450);
+    for (let x = 750; x <= 1140; x += 60) {
+        addWall(x, 210);
+        addWall(x, 570);
     }
-    // Center bottleneck complexity
-    for (let y = 90; y <= 540; y += 30) {
-        if (y !== 300) {
-            addWall(420, y);
-            addWall(480, y);
+    for (let y = 150; y <= 630; y += 90) {
+        if (y !== 360) {
+            addWall(570, y);
+            addWall(690, y);
         }
     }
-    // Blind loops in corners
-    for (let y = 60; y <= 180; y += 30) addWall(210, y);
-    for (let y = 450; y <= 590; y += 30) addWall(660, y);
 }
 
 function layoutTen(addWall) {
-    // "The Chaos Engine" - High-density block groupings creating narrow 1-tile winding tracks everywhere
-    for (let x = 90; x <= 810; x += 60) {
-        for (let y = 90; y <= 540; y += 60) {
-            // Skips cells dynamically to keep a valid path open but masked
-            if ((x === 90 && y === 90) || (x === 810 && y === 540) || (x === 450 && y === 270)) continue;
-            
+    // "The Modular Maze" - Balanced grid spacing ensuring full walkability
+    for (let x = 120; x <= 1140; x += 120) {
+        for (let y = 120; y <= 660; y += 120) {
             addWall(x, y);
-            
-            // Generate surrounding noise structures
-            if (x % 180 === 0 && y !== 210) addWall(x + 30, y);
-            if (y % 120 === 0 && x !== 570) addWall(x, y + 30);
+            addWall(x + 30, y);
+            if (x % 240 === 0) addWall(x, y + 30);
         }
     }
 }
 
 function layoutEleven(addWall) {
-    // "The Classic Winder" - Inspired by the winding orthogonal paths in image_1ee405.png
-    // Creates a long, singular main path with deceptive orthogonal dead ends.
-
-    // 1. Major vertical partitions to create winding columns
-    for (let y = 120; y <= 540; y += 30) {
-        if (y !== 450) addWall(150, y);                   // Left-most barrier
-        if (y !== 150 && y !== 300) addWall(330, y);      // Mid-left barrier
-        if (y !== 240 && y !== 510) addWall(510, y);      // Mid-right barrier
-        if (y !== 120 && y !== 390) addWall(690, y);      // Right-most barrier
+    // "Open Circuit" - Clean parallel tracks with broad crossover points
+    for (let y = 150; y <= 660; y += 150) {
+        for (let x = 90; x <= 1170; x += 30) {
+            if (x % 270 !== 0) addWall(x, y);
+        }
     }
-
-    // 2. Major horizontal barriers to cap off the vertical columns
-    for (let x = 60; x <= 330; x += 30) {
-        if (x !== 240) addWall(x, 270);
+    for (let x = 270; x <= 990; x += 360) {
+        for (let y = 90; y <= 720; y += 30) {
+            if (y % 300 !== 0) addWall(x, y);
+        }
     }
-    for (let x = 330; x <= 690; x += 30) {
-        if (x !== 420 && x !== 600) addWall(x, 150);
-        if (x !== 510) addWall(x, 420);
-    }
-    for (let x = 510; x <= 840; x += 30) {
-        if (x !== 780) addWall(x, 270);
-    }
-
-    // 3. Deceptive hooks and dead-end micro-walls (The "U-Turns")
-    // Left zone traps
-    addWall(90, 150); addWall(90, 180); addWall(90, 210);
-    
-    // Bottom-mid zone traps
-    addWall(240, 360); addWall(270, 360);
-    
-    // Center trap
-    addWall(420, 240); addWall(420, 270); addWall(450, 270);
-    
-    // Bottom-right traps
-    addWall(600, 480); addWall(600, 510); addWall(630, 510);
-    
-    // Top-right exit guards
-    addWall(750, 90);  addWall(750, 120); addWall(750, 150);
 }

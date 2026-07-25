@@ -29,7 +29,7 @@ let timeLeft = 300;
 let lives = 3;
 let currentLevel = 1; 
 let maxLevel = 3;     
-let moveSpeed = 1.2; 
+let moveSpeed = 0.8;
 
 let coins = [];
 let spikes = [];
@@ -367,9 +367,8 @@ function spawnSmartEnemies(scene, amount) {
         enemy.setDepth(9);
         
         enemy.direction = Phaser.Math.Between(0, 3); 
-        enemy.baseSpeed = 0.6;
-        enemy.chaseSpeed = 1.1
-        ; 
+        enemy.baseSpeed = 0.7;
+        enemy.chaseSpeed = 1.1; 
         
         smartEnemies.push(enemy);
     }
