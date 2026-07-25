@@ -1,3 +1,8 @@
+// Check if the page was refreshed and redirect to main page
+if (performance.getEntriesByType("navigation")[0]?.type === "reload" || performance.navigation.type === 1) {
+    window.location.href = "index.html";
+}
+
 /*
 ==========================================
 Escape Hidden Exit
@@ -27,7 +32,7 @@ let isCinematic = false;
 let score = 0;
 let timeLeft = 300;
 let lives = 3;
-let currentLevel = 1; 
+let currentLevel = 1;    
 let maxLevel = 3;     
 let moveSpeed = 0.8;
 
@@ -210,37 +215,37 @@ function setupLevel(scene) {
 
     if (scene.exit) scene.exit.setVisible(false);
 
-    spawnKey(scene);             
+    spawnKey(scene);            
     createCoins(scene, 10);      
     createSpikes(scene, 3 + currentLevel);  
     spawnSmartEnemies(scene, 3 + currentLevel); 
-    createMysteryTraps(scene, 2);               
+    createMysteryTraps(scene, 2);              
     
     playLevelIntro(scene);
 
 
-    // ADD THIS CODE BLOCK:
-    const avatarData = localStorage.getItem("playerAvatar");
-    const name = localStorage.getItem("playerName") || "Player 1";
+    // ADD THIS CODE BLOCK:
+    const avatarData = localStorage.getItem("playerAvatar");
+    const name = localStorage.getItem("playerName") || "Player 1";
 
-    if (avatarData) {
-        // Create an HTML container for the UI
-        const ui = document.createElement('div');
-        ui.style.position = 'absolute';
-        ui.style.top = '20px';
-        ui.style.right = '20px';
-        ui.style.textAlign = 'center';
-        ui.style.zIndex = '1000'; // Ensures it stays above the canvas
+    if (avatarData) {
+        // Create an HTML container for the UI
+        const ui = document.createElement('div');
+        ui.style.position = 'absolute';
+        ui.style.top = '20px';
+        ui.style.right = '20px';
+        ui.style.textAlign = 'center';
+        ui.style.zIndex = '1000'; // Ensures it stays above the canvas
 
-        ui.innerHTML = `
-            <img src="${avatarData}" style="width:150px; height:150px; border-radius:50%; border:3px solid #00ffcc; object-fit: cover;">
-            <div style="color:#ffffff; font-family:Arial, sans-serif; font-weight:bold; margin-top:5px; text-shadow: 1px 1px 2px #000;">
-                ${name}
-            </div>
-        `;
-        
-        document.body.appendChild(ui);
-    }
+        ui.innerHTML = `
+            <img src="${avatarData}" style="width:150px; height:150px; border-radius:50%; border:3px solid #00ffcc; object-fit: cover;">
+            <div style="color:#ffffff; font-family:Arial, sans-serif; font-weight:bold; margin-top:5px; text-shadow: 1px 1px 2px #000;">
+                ${name}
+            </div>
+        `;
+        
+        document.body.appendChild(ui);
+    }
 
 }
 
@@ -466,10 +471,10 @@ function createSpikes(scene, amount) {
             spikes.forEach(s => {
                 s.isActiveTrap = !s.isActiveTrap;
                 if (s.isActiveTrap) {
-                    s.setAlpha(1.0);     
+                    s.setAlpha(1.0);    
                     s.setTint(0xff3333); 
                 } else {
-                    s.setAlpha(0.3);     
+                    s.setAlpha(0.3);    
                     s.clearTint();
                 }
             });
@@ -786,13 +791,13 @@ Time Bonus : +${timeLeft * 5}`,
 
             const loading = sceneRef.time.addEvent({
 
-                delay: 120,
+                delay: 30,
 
-                repeat: 50,
+                repeat: 10,
 
                 callback: () => {
 
-                    percent += 2;
+                    percent += 10;
 
                     let bars = Math.floor(percent / 10);
 
@@ -955,20 +960,6 @@ function showGameOverScreen(message) {
     return messages[Math.floor(Math.random() * messages.length)];
 }
 
-// Then call it in your endGame function:
-endGame(getFunnyDeathMessage());function getFunnyDeathMessage() {
-    const messages = [
-        "The Hunter caught you. You weren't that fast, were you?",
-        "Spiked! Did you think that was a jump pad?",
-        "You died. At least the high score board will have a good laugh.",
-        "You ran out of time. Maybe try running... faster?",
-        "Ouch. That looked like it hurt in 8-bit resolution.",
-        "The Hunter says thanks for the snack."
-    ];
-    return messages[Math.floor(Math.random() * messages.length)];
-}
-
-// Then call it in your endGame function:
 endGame(getFunnyDeathMessage());
     // Click to return to menu
     let btn = sceneRef.add.text(900, 750, "CLICK TO RETURN TO MENU", { fontSize: "24px", color: "#00ffcc", backgroundColor: "#333" })
@@ -976,4 +967,3 @@ endGame(getFunnyDeathMessage());
         
     btn.on('pointerdown', () => { window.location.href = "index.html"; });
 }
-
