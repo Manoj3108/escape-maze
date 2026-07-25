@@ -99,7 +99,30 @@ function getRandomValidSpot(scene) {
     } while (hitsWall(rx, ry));
     return { x: rx, y: ry };
 }
+// ======================================
+// FX Helper: Screen Shake & Particles
+// ======================================
+function triggerActionFX(x, y, colorHex = 0x00ffcc) {
+    sceneRef.cameras.main.shake(200, 0.005);
 
+    for (let i = 0; i < 8; i++) {
+        let p = sceneRef.add.circle(x, y, 4, colorHex, 1);
+        p.setDepth(15);
+        
+        let angle = Math.random() * Math.PI * 2;
+        let speed = Phaser.Math.Between(30, 80);
+        
+        sceneRef.tweens.add({
+            targets: p,
+            x: x + Math.cos(angle) * speed,
+            y: y + Math.sin(angle) * speed,
+            alpha: 0,
+            scale: 0.2,
+            duration: 400,
+            onComplete: () => p.destroy()
+        });
+    }
+}
 // ======================================
 // CREATE
 // ======================================
@@ -302,6 +325,9 @@ function clearLevel(scene) {
     if (scene.keyItem) scene.keyItem.destroy();
     if (scene.exit) scene.exit.destroy();
 
+    // Reset music playback rate back to normal for the next level
+    if (scene.bgm) scene.bgm.setRate(1.0);
+
     scene.walls = []; coins = []; spikes = []; smartEnemies = []; mysteryTraps = []; trapGlows = [];
 }
 
@@ -486,15 +512,17 @@ function checkTrapCollision() {
     for (let spike of spikes) {
         if (spike.isActiveTrap) {
             if (Phaser.Math.Distance.Between(player.x, player.y, spike.x, spike.y) < 15) {
+                
+                // Trigger shake and red particle burst
+                triggerActionFX(player.x, player.y, 0xff0055);
+
                 if (spike.isLethal) {
-                    // Reduces Life
                     statusText.setText("Lethal Trap! Life Lost!");
                     takeDamage();
                 } else {
-                    // Randomly Teleports Player
                     let newPos = getRandomValidSpot(sceneRef);
                     player.setPosition(newPos.x, newPos.y);
-                    sceneRef.cameras.main.flash(400, 200, 0, 255); // Purple flash for teleport
+                    sceneRef.cameras.main.flash(400, 200, 0, 255); 
                     statusText.setText("Whoosh! You hit a Teleport Trap!");
                 }
                 return;
@@ -626,9 +654,19 @@ function checkKeyCollection() {
 
     if (Phaser.Math.Distance.Between(player.x, player.y, sceneRef.keyItem.x, sceneRef.keyItem.y) < 28) {
         sceneRef.hasKey = true;
+        
+        // Trigger particle and camera shake FX
+        triggerActionFX(sceneRef.keyItem.x, sceneRef.keyItem.y, 0xffff00);
+        
         sceneRef.keyItem.destroy();
 
         if(sceneRef.sfx_key) sceneRef.sfx_key.play(); 
+        
+        // Dynamic BGM Pitch/Rate Increase for Tension
+        if(sceneRef.bgm) {
+            sceneRef.bgm.setRate(1.25); 
+        }
+
         addBonus(200);
         statusText.setText("Key Found! Enemies are hunting you!");
 
