@@ -41,6 +41,10 @@ let spikes = [];
 let smartEnemies = []; 
 let mysteryTraps = []; 
 let trapGlows = []; 
+let powerUps = [];
+
+let hasShield = false;
+let isSpeedBoosted = false;
 
 // ------------------------------------
 // Phaser Config
@@ -78,6 +82,7 @@ function preload() {
     this.load.image("coin", "assets/coin.svg");
     this.load.image("spike", "assets/spike.svg"); 
     this.load.image("gift", "assets/gift.svg"); 
+    this.load.image("powerup", "assets/powerup.svg");
 
     // Audio
     this.load.audio("bgm", "assets/bgm.mp3");
@@ -99,6 +104,7 @@ function getRandomValidSpot(scene) {
     } while (hitsWall(rx, ry));
     return { x: rx, y: ry };
 }
+
 // ======================================
 // FX Helper: Screen Shake & Particles
 // ======================================
@@ -123,6 +129,7 @@ function triggerActionFX(x, y, colorHex = 0x00ffcc) {
         });
     }
 }
+
 // ======================================
 // CREATE
 // ======================================
@@ -243,6 +250,7 @@ function setupLevel(scene) {
     createSpikes(scene, 3 + currentLevel);  
     spawnSmartEnemies(scene, 3 + currentLevel); 
     createMysteryTraps(scene, 2);              
+    createPowerUps(scene, 3);
     
     playLevelIntro(scene);
 
@@ -320,6 +328,7 @@ function clearLevel(scene) {
     if (spikes) spikes.forEach(s => s.destroy());
     if (smartEnemies) smartEnemies.forEach(e => e.destroy());
     if (mysteryTraps) mysteryTraps.forEach(m => m.destroy());
+    if (powerUps) powerUps.forEach(p => p.destroy());
     if (trapGlows) trapGlows.forEach(g => g.destroy());
     
     if (scene.keyItem) scene.keyItem.destroy();
@@ -328,7 +337,7 @@ function clearLevel(scene) {
     // Reset music playback rate back to normal for the next level
     if (scene.bgm) scene.bgm.setRate(1.0);
 
-    scene.walls = []; coins = []; spikes = []; smartEnemies = []; mysteryTraps = []; trapGlows = [];
+    scene.walls = []; coins = []; spikes = []; smartEnemies = []; mysteryTraps = []; powerUps = []; trapGlows = [];
 }
 
 // ======================================
@@ -343,6 +352,7 @@ function update() {
 
     checkTrapCollision(); 
     checkMysteryTraps(); 
+    checkPowerUps();
     handleEnemyCollision(); 
     checkCoinCollection();  
     checkKeyCollection();
@@ -400,6 +410,7 @@ function spawnSmartEnemies(scene, amount) {
         enemy.direction = Phaser.Math.Between(0, 3); 
         enemy.baseSpeed = 0.7;
         enemy.chaseSpeed = 1.1; 
+        enemy.isFrozen = false;
         
         smartEnemies.push(enemy);
     }
@@ -408,6 +419,8 @@ function spawnSmartEnemies(scene, amount) {
 function updateSmartEnemies() {
     let isAggroMode = sceneRef.hasKey;
     for (let enemy of smartEnemies) {
+        if (enemy.isFrozen) continue;
+
         let distToPlayer = Phaser.Math.Distance.Between(enemy.x, enemy.y, player.x, player.y);
         
         if (isAggroMode && distToPlayer < 150) {
@@ -581,10 +594,98 @@ function checkMysteryTraps() {
 }
 
 // ======================================
+// POWER-UPS & CONSUMABLES
+// ======================================
+
+function createPowerUps(scene, amount) {
+    powerUps = [];
+    const types = ["speed", "freeze", "shield"];
+
+    for (let i = 0; i < amount; i++) {
+        let rx, ry;
+        do {
+            rx = Phaser.Math.Between(60, 840);
+            ry = Phaser.Math.Between(60, 590);
+        } while (hitsWall(rx, ry));
+
+        let glow = createWhiteGlow(scene, rx, ry);
+        let pUp = scene.add.image(rx, ry, "powerup");
+        pUp.setScale(0.5);
+        pUp.setDepth(4);
+        pUp.glowRef = glow;
+        
+        pUp.powerType = types[Phaser.Math.Between(0, types.length - 1)];
+
+        if (pUp.powerType === "speed") pUp.setTint(0x00ffff);
+        else if (pUp.powerType === "freeze") pUp.setTint(0x0088ff);
+        else if (pUp.powerType === "shield") pUp.setTint(0xff00ff);
+
+        scene.tweens.add({
+            targets: pUp, scale: 0.6, duration: 800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
+        });
+
+        powerUps.push(pUp);
+    }
+}
+
+function checkPowerUps() {
+    for (let i = powerUps.length - 1; i >= 0; i--) {
+        let pUp = powerUps[i];
+        if (Phaser.Math.Distance.Between(player.x, player.y, pUp.x, pUp.y) < 25) {
+            pUp.glowRef.destroy();
+            pUp.destroy();
+            powerUps.splice(i, 1);
+
+            if (sceneRef.sfx_coin) sceneRef.sfx_coin.play();
+            triggerActionFX(pUp.x, pUp.y, 0x00ffcc);
+
+            if (pUp.powerType === "speed") {
+                statusText.setText("Power-Up: Speed Boost Active!");
+                if (!isSpeedBoosted) {
+                    isSpeedBoosted = true;
+                    moveSpeed *= 1.5;
+                    sceneRef.time.delayedCall(5000, () => {
+                        moveSpeed /= 1.5;
+                        isSpeedBoosted = false;
+                        statusText.setText("Speed Boost Expired.");
+                    });
+                }
+            } 
+            else if (pUp.powerType === "freeze") {
+                statusText.setText("Power-Up: Enemies Frozen!");
+                for (let enemy of smartEnemies) {
+                    enemy.isFrozen = true;
+                }
+                sceneRef.time.delayedCall(4000, () => {
+                    for (let enemy of smartEnemies) {
+                        enemy.isFrozen = false;
+                    }
+                    statusText.setText("Enemies Unfrozen!");
+                });
+            } 
+            else if (pUp.powerType === "shield") {
+                statusText.setText("Power-Up: Energy Shield Acquired!");
+                hasShield = true;
+                player.setTint(0xff00ff);
+            }
+        }
+    }
+}
+
+// ======================================
 // DAMAGE & LIVES 
 // ======================================
 
 function takeDamage() {
+    if (hasShield) {
+        hasShield = false;
+        player.clearTint();
+        statusText.setText("Shield absorbed the damage!");
+        if (sceneRef.sfx_hurt) sceneRef.sfx_hurt.play();
+        sceneRef.cameras.main.flash(300, 255, 0, 255);
+        return;
+    }
+
     lives--;
     livesText.setText("Lives : " + lives);
     if(sceneRef.sfx_hurt) sceneRef.sfx_hurt.play();
