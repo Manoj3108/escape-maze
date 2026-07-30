@@ -1040,42 +1040,44 @@ Time Bonus : +${timeLeft * 5}`,
 // GAME OVER
 // ======================================
 
+// ======================================
+// GAME OVER / VICTORY
+// ======================================
+
 function endGame(reason) {
     if (gameOver) return;
-
-    lives--; // Subtract a life
-
-    if (lives > 0) {
-        // Player still has lives
-        alert("System Alert: Life Lost! \nRemaining Lives: " + lives + "\n\nGet ready for the next attempt.");
-        
-        // Reset player position instead of restarting the whole game
-        player.setPosition(startX, startY); 
-        return;
-    }
-
-    // No lives left - Final Game Over
     gameOver = true;
     
     // Stop Music
     if (sceneRef.bgm) sceneRef.bgm.stop();
     if (sceneRef.sfx_hurt) sceneRef.sfx_hurt.play();
     
-    // The "Funny" Final Death Messages
-    const finalMessages = [
-        "SYSTEM CRITICAL: All lives exhausted. You are not meant for this maze.",
-        "GAME OVER: Even the best runners eventually run out of luck.",
-        "TERMINATED: The Hunter is now officially bored of you.",
-        "ERROR 404: Skill not found. Restarting simulation...",
-        "DELETED: Your performance was... memorable, but ultimately fatal."
-    ];
+    // Create a dark overlay for the end screen
+    let overlay = sceneRef.add.rectangle(
+        sceneRef.cameras.main.centerX,
+        sceneRef.cameras.main.centerY,
+        2000, 2000, 0x000000, 0.9
+    ).setScrollFactor(0).setDepth(1000);
     
-    let finalMsg = finalMessages[Math.floor(Math.random() * finalMessages.length)];
-    
-    alert(finalMsg + "\n\nFinal Score: " + score + "\n\nReturning to Main Menu.");
-    
-    // Redirect to menu
-    window.location.href = "index.html";
+    // Display Reason / Message
+    let endTitle = sceneRef.add.text(
+        sceneRef.cameras.main.centerX,
+        sceneRef.cameras.main.centerY - 60,
+        reason,
+        { fontSize: "32px", color: "#00ffcc", align: "center", fontStyle: "bold" }
+    ).setOrigin(0.5).setScrollFactor(0).setDepth(1001);
+
+    // Click to return to menu button
+    let btn = sceneRef.add.text(
+        sceneRef.cameras.main.centerX,
+        sceneRef.cameras.main.centerY + 80,
+        "CLICK TO RETURN TO MENU",
+        { fontSize: "24px", color: "#ffffff", backgroundColor: "#333333", padding: { x: 15, y: 10 } }
+    ).setOrigin(0.5).setScrollFactor(0).setDepth(1001).setInteractive();
+        
+    btn.on('pointerdown', () => { 
+        window.location.href = "index.html"; 
+    });
 }
 
 function showGameOverScreen(message) {
