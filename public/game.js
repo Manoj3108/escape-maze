@@ -644,7 +644,7 @@ function checkPowerUps() {
                 if (!isSpeedBoosted) {
                     isSpeedBoosted = true;
                     moveSpeed *= 1.8
-                    sceneRef.time.delayedCall(5000, () => {
+                    sceneRef.time.delayedCall(8000, () => {
                         moveSpeed /= 1.8;
                         isSpeedBoosted = false;
                         statusText.setText("Speed Boost Expired.");
