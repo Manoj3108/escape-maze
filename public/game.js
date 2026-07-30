@@ -34,7 +34,7 @@ let timeLeft = 300;
 let lives = 3;
 let currentLevel = 1;    
 let maxLevel = 3;     
-let moveSpeed = 0.8;
+let moveSpeed = 1.0;
 
 let coins = [];
 let spikes = [];
@@ -643,9 +643,9 @@ function checkPowerUps() {
                 statusText.setText("Power-Up: Speed Boost Active!");
                 if (!isSpeedBoosted) {
                     isSpeedBoosted = true;
-                    moveSpeed *= 1.2
+                    moveSpeed *= 1.8
                     sceneRef.time.delayedCall(5000, () => {
-                        moveSpeed /= 1.2;
+                        moveSpeed /= 1.8;
                         isSpeedBoosted = false;
                         statusText.setText("Speed Boost Expired.");
                     });
